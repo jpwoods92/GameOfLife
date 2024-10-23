@@ -7,9 +7,8 @@ const startButton = document.getElementById("start-button");
 const welcome = document.getElementById("welcome-header");
 const generation = document.getElementById("generation");
 // when modifying these two values, don't forget to update css class for gridContainer
-const gridSize = 625; // 25X25 grid
-const columnSize = 25;
-const rowSize = 25;
+const columnSize = 50;
+const rowSize = 50;
 
 let currentGeneration = 0;
 let continueUpdating = true;
@@ -118,30 +117,24 @@ const generateGrid = () => {
   const random = createSeededRandom(seed);
 
   // Create cells
-  let row = 0;
-  let col = 0;
-  for (let i = 0; i < gridSize; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    const cellId = uuidv4();
-    cell.id = cellId;
-    // Use seeded random to determine if cell is alive
-    if (random() < probability) {
-      cell.classList.add("alive");
-      cell.setAttribute("data-alive", "true");
-    } else {
-      cell.setAttribute("data-alive", "false");
-    }
-    cell.setAttribute("data-row", row);
-    cell.setAttribute("data-col", col);
+  for (let row = 0; row < rowSize; row++) {
+    for (let col = 0; col < columnSize; col++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      const cellId = uuidv4();
+      cell.id = cellId;
+      // Use seeded random to determine if cell is alive
+      if (random() < probability) {
+        cell.classList.add("alive");
+        cell.setAttribute("data-alive", "true");
+      } else {
+        cell.setAttribute("data-alive", "false");
+      }
+      cell.setAttribute("data-row", row);
+      cell.setAttribute("data-col", col);
 
-    gridCellIds.push(cellId);
-    grid.appendChild(cell);
-    if (i > 0 && i % (columnSize - 1) === 0) {
-      col = 0;
-      row++;
-    } else {
-      col++;
+      gridCellIds.push(cellId);
+      grid.appendChild(cell);
     }
   }
 };
