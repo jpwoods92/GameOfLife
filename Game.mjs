@@ -9,6 +9,7 @@ const generation = document.getElementById("generation");
 // when modifying these two values, don't forget to update css class for gridContainer
 const gridSize = 625; // 25X25 grid
 const columnSize = 25;
+const rowSize = 25;
 
 let currentGeneration = 0;
 let continueUpdating = true;
@@ -39,7 +40,7 @@ function getNeighbors(cell) {
   }
 
   // Check down neighbor
-  if (row < gridSize - 1) {
+  if (row < rowSize - 1) {
     neighbors.push(getNeighbor(row + 1, col));
   }
 
@@ -64,12 +65,12 @@ function getNeighbors(cell) {
   }
 
   // Check diagonal down left neightbor
-  if (row < gridSize - 1 && col > 0) {
+  if (row < rowSize - 1 && col > 0) {
     neighbors.push(getNeighbor(row + 1, col - 1));
   }
 
   // Check diagonal down right neightbor
-  if (row < gridSize - 1 && col < columnSize - 1) {
+  if (row < rowSize - 1 && col < columnSize - 1) {
     neighbors.push(getNeighbor(row + 1, col + 1));
   }
 
@@ -136,7 +137,7 @@ const generateGrid = () => {
 
     gridCellIds.push(cellId);
     grid.appendChild(cell);
-    if (i > 0 && i % columnSize === 0) {
+    if (i > 0 && i % (columnSize - 1) === 0) {
       col = 0;
       row++;
     } else {
@@ -152,7 +153,7 @@ const animate = withFrameDelay(() => {
   if (continueUpdating) {
     animate();
   }
-}, 500);
+}, 50);
 
 function cleanUp() {
   if (gridCellIds) {
