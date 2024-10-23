@@ -8,8 +8,8 @@ const randomizeButton = document.getElementById("randomize-button");
 const resetButton = document.getElementById("reset-button");
 const generation = document.getElementById("generation");
 // when modifying these two values, don't forget to update css class for gridContainer
-const columnSize = 50;
-const rowSize = 50;
+const columnSize = 100;
+const rowSize = 100;
 
 let currentGeneration = 0;
 let continueUpdating = false;
@@ -18,7 +18,7 @@ let gridCellIds = [];
 
 let cellNeighborMap = {};
 
-function reviveCell(cell) {
+function birthCell(cell) {
   cell.classList.add("alive");
   cell.setAttribute("data-alive", "true");
 }
@@ -92,6 +92,8 @@ function getLivingNeighborsCount(neighbors) {
 function updateCells() {
   // iterate through grid cells and update their status per animation tick
   continueUpdating = false;
+  const cellsMarkedForDeath = [];
+  const cellsMarkedForBirth = [];
   gridCellIds.forEach((cellId) => {
     const cell = document.getElementById(cellId);
     const cellStatus = cell.getAttribute("data-alive");
@@ -102,14 +104,17 @@ function updateCells() {
       // revive if 3 neighbors alive
       if (liveNeighborsCount === 3) {
         continueUpdating = true;
-        reviveCell(cell);
+        cellsMarkedForBirth.push(cell);
       }
       // if cell is alive kill if too few neighbors or too many
     } else if (liveNeighborsCount < 2 || liveNeighborsCount > 3) {
       continueUpdating = true;
-      killCell(cell);
+      cellsMarkedForDeath.push(cell);
     }
   });
+
+  cellsMarkedForBirth.forEach((cell) => birthCell(cell));
+  cellsMarkedForDeath.forEach((cell) => killCell(cell));
 }
 
 const generateGrid = () => {
@@ -145,7 +150,7 @@ const animate = withFrameDelay(() => {
   if (continueUpdating) {
     animate();
   }
-}, 50);
+}, 16.67);
 
 function reset() {
   if (gridCellIds) {
@@ -184,7 +189,7 @@ function handleGridClick(event) {
     const cell = event.target;
     const cellStatus = cell.getAttribute("data-alive");
     if (cellStatus === "false") {
-      reviveCell(cell);
+      birthCell(cell);
     } else if (cellStatus === "true") {
       killCell(cell);
     }
