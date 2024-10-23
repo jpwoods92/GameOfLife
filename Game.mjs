@@ -15,6 +15,8 @@ let continueUpdating = true;
 
 let gridCellIds = [];
 
+let cellNeighborMap = {};
+
 function reviveCell(cell) {
   cell.classList.add("alive");
   cell.setAttribute("data-alive", "true");
@@ -92,9 +94,7 @@ function updateCells() {
   gridCellIds.forEach((cellId) => {
     const cell = document.getElementById(cellId);
     const cellStatus = cell.getAttribute("data-alive");
-    const row = parseFloat(cell.getAttribute("data-row"));
-    const col = parseFloat(cell.getAttribute("data-col"));
-    const neighbors = getNeighbors({ row, col });
+    const neighbors = cellNeighborMap[cellId];
     const liveNeighborsCount = getLivingNeighborsCount(neighbors);
     // if cell is dead
     if (cellStatus === "false") {
@@ -137,6 +137,14 @@ const generateGrid = () => {
       grid.appendChild(cell);
     }
   }
+  // get cell neighbors
+  gridCellIds.forEach((cellId) => {
+    const cell = document.getElementById(cellId);
+    const row = parseFloat(cell.getAttribute("data-row"));
+    const col = parseFloat(cell.getAttribute("data-col"));
+    const neighbors = getNeighbors({ row, col });
+    cellNeighborMap[cellId] = neighbors;
+  });
 };
 
 const animate = withFrameDelay(() => {
@@ -158,6 +166,7 @@ function cleanUp() {
   continueUpdating = true;
   currentGeneration = 0;
   gridCellIds = [];
+  cellNeighborMap = {};
 }
 
 function handleStart() {
