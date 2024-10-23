@@ -1,0 +1,23 @@
+.body {
+  background-color: white;
+}
+
+.grid {
+  display: none;
+  grid-template-columns: repeat(25, 30px);
+  gap: 2px;
+  padding: 10px;
+  background: #333;
+  width: fit-content;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background: black;
+  transition: background-color 0.3s;
+}
+
+.alive {
+  background: white;
+}
