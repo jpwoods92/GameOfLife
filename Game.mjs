@@ -4,14 +4,15 @@ const seedField = document.getElementById("seed-field");
 const grid = document.getElementById("gridContainer");
 const probabilityField = document.getElementById("probability-field");
 const startButton = document.getElementById("start-button");
-const welcome = document.getElementById("welcome-header");
+const randomizeButton = document.getElementById("randomize-button");
+const resetButton = document.getElementById("reset-button");
 const generation = document.getElementById("generation");
 // when modifying these two values, don't forget to update css class for gridContainer
 const columnSize = 50;
 const rowSize = 50;
 
 let currentGeneration = 0;
-let continueUpdating = true;
+let continueUpdating = false;
 
 let gridCellIds = [];
 
@@ -112,10 +113,6 @@ function updateCells() {
 }
 
 const generateGrid = () => {
-  const seed = parseFloat(seedField.value || Math.random() * 100000);
-  const probability = parseFloat(probabilityField.value || 0.3);
-  const random = createSeededRandom(seed);
-
   // Create cells
   for (let row = 0; row < rowSize; row++) {
     for (let col = 0; col < columnSize; col++) {
@@ -123,13 +120,7 @@ const generateGrid = () => {
       cell.className = "cell";
       const cellId = uuidv4();
       cell.id = cellId;
-      // Use seeded random to determine if cell is alive
-      if (random() < probability) {
-        cell.classList.add("alive");
-        cell.setAttribute("data-alive", "true");
-      } else {
-        cell.setAttribute("data-alive", "false");
-      }
+      cell.setAttribute("data-alive", "false");
       cell.setAttribute("data-row", row);
       cell.setAttribute("data-col", col);
 
@@ -156,25 +147,52 @@ const animate = withFrameDelay(() => {
   }
 }, 50);
 
-function cleanUp() {
+function reset() {
   if (gridCellIds) {
     gridCellIds.forEach((cellId) => {
       const cell = document.getElementById(cellId);
-      grid.removeChild(cell);
+      cell.setAttribute("data-alive", "false");
+      cell.classList.remove("alive");
     });
   }
-  continueUpdating = true;
+  continueUpdating = false;
   currentGeneration = 0;
-  gridCellIds = [];
-  cellNeighborMap = {};
+}
+
+function randomizeGrid() {
+  reset();
+  const seed = parseFloat(seedField.value || Math.random() * 100000);
+  const probability = parseFloat(probabilityField.value || 0.3);
+  const random = createSeededRandom(seed);
+  gridCellIds.forEach((cellId) => {
+    const cell = document.getElementById(cellId);
+    // Use seeded random to determine if cell is alive
+    if (random() < probability) {
+      cell.classList.add("alive");
+      cell.setAttribute("data-alive", "true");
+    }
+  });
 }
 
 function handleStart() {
-  cleanUp();
-  generateGrid();
-  grid.style.cssText = "display: grid;";
-  welcome.style.cssText = "display: none;";
+  continueUpdating = true;
   animate();
 }
 
+function handleGridClick(event) {
+  if (continueUpdating === false) {
+    const cell = event.target;
+    const cellStatus = cell.getAttribute("data-alive");
+    if (cellStatus === "false") {
+      reviveCell(cell);
+    } else if (cellStatus === "true") {
+      killCell(cell);
+    }
+  }
+}
+
+generateGrid();
+grid.addEventListener("click", handleGridClick);
 startButton.addEventListener("click", handleStart);
+randomizeButton.addEventListener("click", randomizeGrid);
+resetButton.addEventListener("click", reset);
